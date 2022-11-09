@@ -2,7 +2,7 @@ stages:
   - build
 
 variables:
-  KANIKO: gcr.io/kaniko-project/executor:v1.9.1
+  KANIKO: gcr.io/kaniko-project/executor:v1.9.0-debug
   PY_3_10: py_3_10_8
   IMG_NAME: pp_testing-${PY_3_10}-${CI_COMMIT_SHORT_SHA}
 
