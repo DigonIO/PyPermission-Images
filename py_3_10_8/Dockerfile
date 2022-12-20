@@ -7,6 +7,12 @@ RUN pacman -S zsh python python-pip mariadb gcc npm --noconfirm
 
 RUN chsh -s /usr/bin/zsh root
 
-RUN pacman -Q -s mariadb
-RUN pacman -Q -s python
-RUN pacman -Q -s npm
+RUN pacman -Q -s mariadb python
+
+# Needed to export mermaid graphs to static svg files
+# See also docker examples for puppeteer:
+# https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md
+RUN pacman -Q -s npm chromium
+RUN useradd -m ciuser
+
+USER ciuser
