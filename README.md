@@ -1,5 +1,8 @@
-# PyPermission Images
+# Images
 
-Container images for the GitLab CI/CD pipelines for the PyPermission project.
+Base images for Digon.IO open source projects.
 
-[PyPermission Repository](https://gitlab.com/DigonIO/pypermission)
+## Projects
+
++ [HostYourDocs](https://gitlab.com/DigonIO/hostyourdocs)
++ [PyPermission](https://gitlab.com/DigonIO/pypermission)
