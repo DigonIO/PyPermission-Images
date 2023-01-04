@@ -1,38 +1,60 @@
 stages:
-  - build
+  - test
+  - release
 
 variables:
   KANIKO: gcr.io/kaniko-project/executor:v1.9.0-debug
-  PY_3_10: py_3_10_8
-  IMG_NAME: pp_testing-${PY_3_10}-${CI_COMMIT_SHORT_SHA}
+  CONTEXT_PATH_PP_BASE: pypermission-base
+  CONTEXT_PATH_HYD_BASE: hostyourdocs-base
+  NAME_PP_BASE: pypermission-base
+  NAME_HYD_BASE: hostyourdocs-base
 
 ####################################################################################################
 ### Testing
 ####################################################################################################
 
-build_test_py_3_10:
-  stage: build
+test_pp_base:
+  stage: test
   image:
     name: ${KANIKO}
     entrypoint: [""]
   script:
     - >
       /kaniko/executor
-      --context ${PY_3_10}
-      --dockerfile ${CPY_3_10}/Dockerfile
-      --destination "${CI_REGISTRY_IMAGE}:${IMG_NAME}"
+      --context ${CONTEXT_PATH_PP_BASE}
+      --destination "${CI_REGISTRY_IMAGE}/${NAME_PP_BASE}:${CI_COMMIT_SHORT_SHA}"
       --verbosity info
       --force
       --no-push
   rules:
-    - if: $CI_COMMIT_REF_NAME != "main" && $CI_COMMIT_TAG == null
+    - if: $CI_COMMIT_REF_NAME == "dev"
+      changes:
+        - ${CONTEXT_PATH_PP_BASE}/Dockerfile
+
+test_hyd_base:
+  stage: test
+  image:
+    name: ${KANIKO}
+    entrypoint: [""]
+  script:
+    - >
+      /kaniko/executor
+      --context ${CONTEXT_PATH_HYD_BASE}
+      --destination "${CI_REGISTRY_IMAGE}/${NAME_HYD_BASE}:${CI_COMMIT_SHORT_SHA}"
+      --verbosity info
+      --force
+      --no-push
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "dev"
+      changes:
+        - ${CONTEXT_PATH_HYD_BASE}/Dockerfile
 
 ####################################################################################################
 ### Release
 ####################################################################################################
 
-build_release_py_3_10:
-  stage: build
+release_pp_base:
+  stage: release
   image:
     name: ${KANIKO}
     entrypoint: [""]
@@ -41,10 +63,32 @@ build_release_py_3_10:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$CI_DEPENDENCY_PROXY_SERVER\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
     - >
       /kaniko/executor
-      --context ${PY_3_10}
-      --dockerfile ${CPY_3_10}/Dockerfile
-      --destination "${CI_REGISTRY_IMAGE}:${IMG_NAME}"
+      --context ${CONTEXT_PATH_PP_BASE}
+      --destination "${CI_REGISTRY_IMAGE}/${NAME_PP_BASE}:${CI_COMMIT_SHORT_SHA}"
       --verbosity info
       --force
   rules:
-    - if: $CI_COMMIT_REF_NAME == "main" && $CI_COMMIT_TAG == null
+    - if: $CI_COMMIT_REF_NAME == "main"
+      changes:
+        - ${CONTEXT_PATH_PP_BASE}/Dockerfile
+      when: manual
+
+release_hyd_base:
+  stage: release
+  image:
+    name: ${KANIKO}
+    entrypoint: [""]
+  script:
+    # https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$CI_DEPENDENCY_PROXY_SERVER\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - >
+      /kaniko/executor
+      --context ${CONTEXT_PATH_HYD_BASE}
+      --destination "${CI_REGISTRY_IMAGE}/${NAME_HYD_BASE}:${CI_COMMIT_SHORT_SHA}"
+      --verbosity info
+      --force
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "main"
+      changes:
+        - ${CONTEXT_PATH_HYD_BASE}/Dockerfile
+      when: manual
