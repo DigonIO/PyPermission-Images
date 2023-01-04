@@ -15,3 +15,5 @@ RUN useradd app
 RUN mkdir /app
 RUN mkdir /data
 RUN chown app:app /data
+
+RUN echo "test"
