@@ -3,7 +3,7 @@ stages:
   - release
 
 variables:
-  KANIKO: gcr.io/kaniko-project/executor:v1.9.0-debug
+  IMG_KANIKO: gcr.io/kaniko-project/executor:v1.9.0-debug
   CONTEXT_PATH_PP_BASE: pypermission-base
   CONTEXT_PATH_HYD_BASE: hostyourdocs-base
   NAME_PP_BASE: pypermission-base
@@ -16,7 +16,7 @@ variables:
 test_pp_base:
   stage: test
   image:
-    name: ${KANIKO}
+    name: ${IMG_KANIKO}
     entrypoint: [""]
   script:
     - >
@@ -34,7 +34,7 @@ test_pp_base:
 test_hyd_base:
   stage: test
   image:
-    name: ${KANIKO}
+    name: ${IMG_KANIKO}
     entrypoint: [""]
   script:
     - >
@@ -56,7 +56,7 @@ test_hyd_base:
 release_pp_base:
   stage: release
   image:
-    name: ${KANIKO}
+    name: ${IMG_KANIKO}
     entrypoint: [""]
   script:
     # https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
@@ -76,7 +76,7 @@ release_pp_base:
 release_hyd_base:
   stage: release
   image:
-    name: ${KANIKO}
+    name: ${IMG_KANIKO}
     entrypoint: [""]
   script:
     # https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
