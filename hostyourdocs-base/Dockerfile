@@ -10,7 +10,7 @@ RUN chsh -s /usr/bin/zsh root
 RUN pacman -Q -s python
 RUN pacman -Q -s mariadb
 
-RUN useradd app
+RUN useradd -m app
 
 RUN mkdir /app
 RUN mkdir /data
